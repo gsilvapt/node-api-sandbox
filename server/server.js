@@ -15,7 +15,7 @@ var {
   Todo
 } = require('./models/todo');
 var {
-  user
+  User
 } = require('./models/user');
 
 /**
@@ -41,6 +41,19 @@ app.post('/todos', (req, res) => {
 });
 
 /**
+ *  Middleware to accept HTTP method GET
+ */
+app.get('/todos', (req, res) => {
+  Todo.find().then((todos) => {
+    res.send({
+      todos
+    })
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+/**
  * Connects to localhost:3000 server
  */
 app.listen(3000, () => {
@@ -49,4 +62,4 @@ app.listen(3000, () => {
 
 module.exports = {
   app
-}
+};
