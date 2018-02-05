@@ -2,5 +2,4 @@
 .node_modules
 .eslintrc
 api.json
-playground/
 node_modules/
