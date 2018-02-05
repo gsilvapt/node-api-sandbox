@@ -26,7 +26,9 @@ var app = express();
 // Method to parse objects to database.
 app.use(bodyParser.json())
 
-// Middleware to accept HTTP method POST
+/**
+ *  Middleware to accept HTTP method POST
+ */
 app.post('/todos', (req, res) => {
   var todo = new Todo({
     text: req.body.text
@@ -39,7 +41,7 @@ app.post('/todos', (req, res) => {
 });
 
 /**
- * Connects server
+ * Connects to localhost:3000 server
  */
 app.listen(3000, () => {
   console.log('Started on port 3000');
