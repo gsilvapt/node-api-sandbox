@@ -8,9 +8,15 @@ var mongoose = require('mongoose');
 /**
  * Custom modules required to run the app
  */
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {user} = require('./models/user');
+var {
+  mongoose
+} = require('./db/mongoose');
+var {
+  Todo
+} = require('./models/todo');
+var {
+  user
+} = require('./models/user');
 
 /**
  * App definition and routing
@@ -38,3 +44,7 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
   console.log('Started on port 3000');
 });
+
+module.exports = {
+  app
+}
