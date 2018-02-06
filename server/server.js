@@ -24,8 +24,10 @@ var {
 
 /**
  * App definition and routing
+ * Port definition
  */
 var app = express();
+var PORT = process.env.PORT || 3000;
 
 // Method to parse objects to database.
 app.use(bodyParser.json())
@@ -87,8 +89,8 @@ app.get('/todos/:id', (req, res) => {
 /**
  * Connects to localhost:3000 server
  */
-app.listen(3000, () => {
-  console.log('Started on port 3000');
+app.listen(PORT, () => {
+  console.log(`Started at port ${PORT}`);
 });
 
 module.exports = {
