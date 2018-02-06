@@ -4,7 +4,7 @@
   "description": "An API Sandbox",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server7server.js",
+    "start": "node server/server.js",
     "test": "mocha server/**/*.test.js",
     "test-watch": "nodemon --exec 'npm test'"
   },
