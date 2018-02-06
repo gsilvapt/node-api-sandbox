@@ -3,6 +3,9 @@
  */
 const expect = require('expect');
 const request = require('supertest');
+const {
+  ObjectID
+} = require('mongodb');
 
 /**
  * Local modules required to this test suite.
@@ -18,9 +21,11 @@ const {
  * Creates two mock tasks to allow the GET /todos method to be tested.
  */
 const todos = [{
+    _id: new ObjectID(),
     text: 'First test todo'
   },
   {
+    _id: new ObjectID(),
     text: 'Second test todo'
   }
 ];
@@ -87,4 +92,34 @@ describe('GET /todos tests', () => {
       })
       .end(done);
   });
+});
+
+describe('GET/todos/:id', () => {
+  it('should return todo doc', (done) => {
+    request(app)
+    // Getting the id of the first todo item created
+      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .expect(200)    // it should be possible to fetch this id
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(todos[0].text);
+      })
+      .end(done);
+  });
+
+  it('should return 404 if todo id not found', (done) => {
+    var aValidObjectID = new ObjectID();
+    request(app)
+      .get(`/todos/${aValidObjectID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if ObjectID is not valid.', (done) => {
+    var anInvalidObjectId = '123';
+    request(app)
+      .get(`/todos/${anInvalidObjectId}`)
+      .expect(404)
+      .end(done);
+});
+
 });
