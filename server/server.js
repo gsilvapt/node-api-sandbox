@@ -18,6 +18,10 @@ var {
   User
 } = require('./models/user');
 
+var {
+  ObjectID
+} = require('mongodb');
+
 /**
  * App definition and routing
  */
@@ -51,6 +55,33 @@ app.get('/todos', (req, res) => {
   }, (e) => {
     res.status(400).send(e);
   });
+});
+
+/**
+ * API routing to get a todo object by ID.
+ * It verifies if the ID is valid from the MongoDB library, returns a 404 if 
+ * not valid;
+ * Checks if the return of findById is not empty, if so returns a 404, if not 
+ * returns the object itself.
+ * If any other error occurs, it returns a 400 status code.
+ */
+app.get('/todos/:id', (req, res) => {
+  var todoId = req.params.id;
+  if (!ObjectID.isValid(todoId)) {
+    return res.status(404).send();
+  } else {
+    Todo.findById(todoId).then((todos) => {
+      if (todos) {
+        res.send({
+          todos
+        });
+      } else {
+        return res.status(404).send();
+      }
+    }, (e) => {
+      return res.status(400).send(e);
+    })
+  }
 });
 
 /**
