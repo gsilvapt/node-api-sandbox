@@ -1,5 +1,8 @@
 [![Build Status](https://travis-ci.org/gsilvapt/node-api-sandbox.svg?branch=master)](https://travis-ci.org/gsilvapt/node-api-sandbox)
 
+[![Coverage Status](https://coveralls.io/repos/github/gsilvapt/node-api-sandbox/badge.svg?branch=master)](https://coveralls.io/github/gsilvapt/node-api-sandbox?branch=master)
+
+
 # RESTful API built in node.
 
 This to-do management app is part of the Complete Node.Js Developer Course on Udemy.
