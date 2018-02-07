@@ -213,6 +213,8 @@ describe('PATCH/todos/:id', () => {
         expect(res.body.todo._id).toBe(hexId);
         expect(res.body.todo.completed).toBe(false);
         expect(res.body.todo.completedAt).toBe(null);
+        // Another option to assert it is null.
+        expect(res.body.todo.completedAt).toNotExist();
       })
       .end(done);
   })

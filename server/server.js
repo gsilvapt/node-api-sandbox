@@ -1,12 +1,17 @@
 /**
- * Third-party modules required to run the app
+ * Loads server and database configurations.
+ */
+require('./config/config.js');
+
+/**
+ * Third-party modules required to run the app.
  */
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 
 /**
- * Custom modules required to run the app
+ * Custom modules required to run the app.
  */
 var {
   mongoose
@@ -23,17 +28,16 @@ var {
 } = require('mongodb');
 
 /**
- * App definition and routing
- * Port definition
+ * App definition and Port definition
  */
 var app = express();
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT;
 
 // Method to parse objects to database.
 app.use(bodyParser.json())
 
 /**
- *  Middleware to accept HTTP method POST
+ *  API routing to allow HTTP method POST
  */
 app.post('/todos', (req, res) => {
   var todo = new Todo({
@@ -47,7 +51,7 @@ app.post('/todos', (req, res) => {
 });
 
 /**
- *  Middleware to accept HTTP method GET
+ *  API routing to allow HTTP method GET
  */
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
