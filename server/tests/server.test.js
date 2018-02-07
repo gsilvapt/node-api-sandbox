@@ -54,7 +54,9 @@ describe('POST /todos', () => {
           return done(err);
         }
 
-        Todo.find({text}).then((todos) => {
+        Todo.find({
+          text
+        }).then((todos) => {
           expect(todos.length).toBe(1);
           expect(todos[0].text).toBe(text);
           done();
@@ -97,9 +99,9 @@ describe('GET /todos tests', () => {
 describe('GET/todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
-    // Getting the id of the first todo item created
+      // Getting the id of the first todo item created
       .get(`/todos/${todos[0]._id.toHexString()}`)
-      .expect(200)    // it should be possible to fetch this id
+      .expect(200) // it should be possible to fetch this id
       .expect((res) => {
         expect(res.body.todo.text).toBe(todos[0].text);
       })
@@ -120,6 +122,44 @@ describe('GET/todos/:id', () => {
       .get(`/todos/${anInvalidObjectId}`)
       .expect(404)
       .end(done);
+  });
 });
 
+describe('DELETE/todos/:id', () => {
+  it('should be able to delete a todo item based on valid ID', (done) => {
+    var hexId = todos[1]._id.toHexString()
+    request(app)
+      // Get the id the of the second item created in the list
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(hexId);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Todo.findById(hexId).then((todo) => {
+          expect(todo).toNotExist();
+          done();
+        }).catch((e) => done());
+      });
+  });
+
+  it('should return a 404 if object ID does not exist in database', (done) => {
+    var anotherValidObjectID = new ObjectID();
+    request(app)
+      .delete(`/todos/${anotherValidObjectID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return a 404 if ID is not valid', (done) => {
+    var anotherInvalidObjectId = '123';
+    request(app)
+      .delete(`/todos/${anotherInvalidObjectId}`)
+      .expect(404)
+      .end(done);
+  });
 });
