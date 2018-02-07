@@ -3,3 +3,6 @@ node_js:
   - "node"
 services:
   - mongodb
+
+script: npm run coverage
+after_sucess: 'npm run coveralls'

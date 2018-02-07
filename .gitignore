@@ -4,4 +4,5 @@ api.json
 playground/
 node_modules/
 .nyc_output/
+coveralls
 .coveralls.yml

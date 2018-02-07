@@ -5,8 +5,10 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && nyc --reporter=text mocha server/**/*.test.js",
-    "test-watch": "nodemon --exec 'npm test'"
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec 'npm test'",
+    "coverage": "nyc --reporter=text mocha server/**/*.test.js",
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
   "engines": {
     "node": "9.5.0"
