@@ -87,6 +87,29 @@ app.get('/todos/:id', (req, res) => {
 });
 
 /**
+ * Route to delete a todo item by id.
+ * Checks if the ID is valid from the MongoDB library, returns a 404 if not.
+ * Checks if the the todo is non empty, if it is returns a 404 not found.
+ * If any other error occurs, it returns a 400 status code.
+ */
+app.delete('/todos/:id', (req, res) => {
+  var todoId = req.params.id;
+
+  if (!ObjectID.isValid(todoId)) {
+    return res.status(404).send();
+  }
+
+  Todo.findByIdAndRemove(todoId).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+    res.send(todo);
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
+
+/**
  * Connects to localhost:3000 server
  */
 app.listen(PORT, () => {
