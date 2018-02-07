@@ -4,5 +4,4 @@ node_js:
 services:
   - mongodb
 
-script: npm run coverage
-after_sucess: 'npm run coveralls'
+after_sucess: npm run coverage
