@@ -1,5 +1,6 @@
 .vscode
 .eslintrc
+.coveralls.yml
 api.json
 playground/
 node_modules/
