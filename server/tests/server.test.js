@@ -26,7 +26,9 @@ const todos = [{
   },
   {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 333
   }
 ];
 
@@ -163,3 +165,79 @@ describe('DELETE/todos/:id', () => {
       .end(done);
   });
 });
+
+describe('PATCH/todos/:id', () => {
+  it('should update the text field of an item if id exists', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var newText = 'Some test changes';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        "completed": true,
+        "text": newText
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(hexId);
+        expect(res.body.todo.text).toBe(newText);
+      })
+      .end(done);
+  });
+
+  it('should set a task completed field to true and updated completedAt',
+    (done) => {
+      var hexId = todos[0]._id.toHexString();
+      request(app)
+        .patch(`/todos/${hexId}`)
+        .send({
+          "completed": true
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.todo._id).toBe(hexId);
+          expect(res.body.todo.completed).toBe(true);
+          expect(res.body.todo.completedAt).toBeA('number');
+        })
+        .end(done);
+    });
+
+  it('should be able to convert a completed task to not completed', (done) => {
+    var hexId = todos[1]._id.toHexString();
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        "completed": false
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(hexId);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBe(null);
+      })
+      .end(done);
+  })
+
+  it('should return not found if can\'t find id in the database', (done) => {
+    var hexId = new ObjectID();
+    var newText = "Some text that should **not** update";
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        "text": newText
+      })
+      .expect(404)
+      .end(done);
+  })
+
+  it('should return 404 with invalid id', (done) => {
+    var hexId = '123';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: true
+      })
+      .expect(404)
+      .end(done);
+  })
+
+})

@@ -1,9 +1,9 @@
 /**
  * Third-party modules required to run the app
  */
-var express = require('express');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 /**
  * Custom modules required to run the app
@@ -109,6 +109,45 @@ app.delete('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send();
   });
+});
+
+/**
+ * Method to update a todo item.
+ * Receiving an ID and a body parameter, it allows an user to set a todo item
+ * as completed (and updates the field completedAt) or change the todo text body.
+ * It never allows the user to change the completedAt field.
+ */
+app.patch('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {
+    $set: body
+  }, {
+    new: true
+  }).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+
+    res.send({
+      todo
+    });
+
+  }).catch((e) => {
+    res.status(404).send();
+  })
 });
 
 /**
