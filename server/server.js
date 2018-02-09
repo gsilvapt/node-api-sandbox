@@ -177,18 +177,16 @@ app.post('/users', (request, response) => {
 /**
  * Method to allow users to login with the API
  */
-app.post('users/login', (request, response) => {
+app.post('/users/login', (request, response) => {
   var credentials = _.pick(request.body, ['email', 'password']);
 
   User.findByCredentials(credentials.email, credentials.password).then((user) => {
-    User.generateAuthToken().then((token) => {
+    return user.generateAuthToken().then((token) => {
       response.header('x-auth', token).send(user);
     });
   }).catch((error) => {
     response.status(400).send();
   });
-
-  // response.send(credentials);
 });
 
 
