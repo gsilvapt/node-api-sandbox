@@ -166,7 +166,9 @@ app.post('/users', (request, response) => {
     var token = user.generateAuthToken();
     return token;
   }).then((token) => {
-    response.header('x-auth', token).send({user});
+    response.header('x-auth', token).send({
+      user
+    });
   }).catch((e) => {
     response.status(400).send(e);
   })
@@ -178,8 +180,16 @@ app.post('/users', (request, response) => {
 app.post('users/login', (request, response) => {
   var credentials = _.pick(request.body, ['email', 'password']);
 
-  response.send(credentials);
-})
+  User.findByCredentials(credentials.email, credentials.password).then((user) => {
+    User.generateAuthToken().then((token) => {
+      response.header('x-auth', token).send(user);
+    });
+  }).catch((error) => {
+    response.status(400).send();
+  });
+
+  // response.send(credentials);
+});
 
 
 /**
