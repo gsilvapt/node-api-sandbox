@@ -298,3 +298,20 @@ describe('/POST/users', () => {
       .end(done);
   });
 });
+
+describe('GET /users/me', () => {
+  it('should be able to get an user email after being created.', (done) => {
+    var newUser = {
+      email: 'abc@domain.etn',
+      password: 'doesntreallymatter'
+    };
+    request(app)
+      .post('/users')
+      .send(newUser)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.user.email).toBe(newUser.email);
+      })
+      .end(done);
+  })
+})

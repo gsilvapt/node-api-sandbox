@@ -22,6 +22,9 @@ var {
 var {
   User
 } = require('./models/user');
+var {
+  authenticate
+} = require('./middleware/authtenticate');
 
 var {
   ObjectID
@@ -39,27 +42,27 @@ app.use(bodyParser.json())
 /**
  *  API routing to allow HTTP method POST
  */
-app.post('/todos', (req, res) => {
+app.post('/todos', (request, response) => {
   var todo = new Todo({
-    text: req.body.text
+    text: request.body.text
   });
   todo.save().then((doc) => {
-    res.send(doc);
-  }, (e) => {
-    res.status(400).send(e);
+    response.send(doc);
+  }, (error) => {
+    response.status(400).send(error);
   })
 });
 
 /**
  *  API routing to allow HTTP method GET
  */
-app.get('/todos', (req, res) => {
+app.get('/todos', (request, response) => {
   Todo.find().then((todos) => {
-    res.send({
+    response.send({
       todos
     })
-  }, (e) => {
-    res.status(400).send(e);
+  }, (error) => {
+    response.status(400).send(error);
   });
 });
 
@@ -71,22 +74,22 @@ app.get('/todos', (req, res) => {
  * returns the object itself.
  * If any other error occurs, it returns a 400 status code.
  */
-app.get('/todos/:id', (req, res) => {
-  var todoId = req.params.id;
+app.get('/todos/:id', (request, response) => {
+  var todoId = request.params.id;
 
   if (!ObjectID.isValid(todoId)) {
-    return res.status(404).send();
+    return response.status(404).send();
   }
 
   Todo.findById(todoId).then((todo) => {
     if (!todo) {
-      return res.status(404).send();
+      return response.status(404).send();
     }
-    res.send({
+    response.send({
       todo
     });
-  }).catch((e) => {
-    res.status(404).send();
+  }).catch((error) => {
+    response.status(404).send();
   });
 });
 
@@ -96,22 +99,22 @@ app.get('/todos/:id', (req, res) => {
  * Checks if the the todo is non empty, if it is returns a 404 not found.
  * If any other error occurs, it returns a 400 status code.
  */
-app.delete('/todos/:id', (req, res) => {
-  var todoId = req.params.id;
+app.delete('/todos/:id', (request, response) => {
+  var todoId = request.params.id;
 
   if (!ObjectID.isValid(todoId)) {
-    return res.status(404).send();
+    return response.status(404).send();
   }
 
   Todo.findByIdAndRemove(todoId).then((todo) => {
     if (!todo) {
-      return res.status(404).send();
+      return response.status(404).send();
     }
-    res.send({
+    response.send({
       todo
     });
-  }).catch((e) => {
-    res.status(400).send();
+  }).catch((error) => {
+    response.status(400).send();
   });
 });
 
@@ -121,12 +124,12 @@ app.delete('/todos/:id', (req, res) => {
  * as completed (and updates the field completedAt) or change the todo text body.
  * It never allows the user to change the completedAt field.
  */
-app.patch('/todos/:id', (req, res) => {
-  var id = req.params.id;
-  var body = _.pick(req.body, ['text', 'completed']);
+app.patch('/todos/:id', (request, response) => {
+  var id = request.params.id;
+  var body = _.pick(request.body, ['text', 'completed']);
 
   if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
+    return response.status(404).send();
   }
 
   if (_.isBoolean(body.completed) && body.completed) {
@@ -142,32 +145,38 @@ app.patch('/todos/:id', (req, res) => {
     new: true
   }).then((todo) => {
     if (!todo) {
-      return res.status(404).send();
+      return response.status(404).send();
     }
 
-    res.send({
+    response.send({
       todo
     });
 
-  }).catch((e) => {
-    res.status(404).send();
+  }).catch((error) => {
+    response.status(404).send();
   })
 });
 
 // POST /users
-app.post('/users', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
+app.post('/users', (request, response) => {
+  var body = _.pick(request.body, ['email', 'password']);
   var user = new User(body);
 
   user.save().then(() => {
     var token = user.generateAuthToken();
     return token;
   }).then((token) => {
-    res.header('x-auth', token).send(user);
+    response.header('x-auth', token).send({user});
   }).catch((e) => {
-    res.status(400).send(e);
+    response.status(400).send(e);
   })
 });
+
+
+
+app.get('/users/me', authenticate, (request, response) => {
+  response.send(request.user);
+})
 
 /**
  * Connects to localhost:3000 server
@@ -179,4 +188,3 @@ app.listen(PORT, () => {
 module.exports = {
   app
 };
-
