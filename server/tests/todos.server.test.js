@@ -82,7 +82,7 @@ describe('GET /todos tests', () => {
   });
 });
 
-describe('GET/todos/:id', () => {
+describe('GET /todos/:id', () => {
   it('should return todo doc', (done) => {
     request(app)
       // Getting the id of the first todo item created
@@ -111,7 +111,7 @@ describe('GET/todos/:id', () => {
   });
 });
 
-describe('DELETE/todos/:id', () => {
+describe('DELETE /todos/:id', () => {
   it('should be able to delete a todo item based on valid ID', (done) => {
     var hexId = todos[1]._id.toHexString()
     request(app)
@@ -150,7 +150,7 @@ describe('DELETE/todos/:id', () => {
   });
 });
 
-describe('PATCH/todos/:id', () => {
+describe('PATCH /todos/:id', () => {
   it('should update the text field of an item if id exists', (done) => {
     var hexId = todos[0]._id.toHexString();
     var newText = 'Some test changes';

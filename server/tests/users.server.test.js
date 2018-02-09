@@ -23,7 +23,7 @@ const {
 
 beforeEach(populateUsers);
 
-describe('/POST/users', () => {
+describe('POST /users', () => {
   it('should allow creating a new user with a valid email and password', (done) => {
     var newUser = {
       email: 'aValidEmail@email.com',
@@ -122,8 +122,48 @@ describe('POST /users/login', () => {
           return done(error);
         }
 
-        User.findById(users[1]._id).then((user) => {
+        User.findById(users[1]._id.toHexString()).then((user) => {
           expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((error) => done(error));
+      });
+  });
+});
+
+describe('DELETE /users/me/token', () => {
+  it('should allow a logged-in user to logout.', (done) => {
+    request(app)
+      .delete('/users/me/token')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .end((error, response) => {
+        if (error) {
+          return done(error);
+        }
+
+        User.findById(users[0]._id).then((user) => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((error) => done(error));
+      });
+  });
+
+  it('shouldn\'t allow a logged out user to loggout again.', (done) => {
+    request(app)
+      .delete('/users/me/token')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .end((error, response) => {
+        if (error) {
+          return done(error);
+        }
+
+        User.findById(users[0]._id).then((user) => {
+          expect(user.tokens.length).toBe(0);
+          request(app)
+            .delete('/users/me/token')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(400)
           done();
         }).catch((error) => done(error));
       });
