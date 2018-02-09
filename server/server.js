@@ -172,8 +172,19 @@ app.post('/users', (request, response) => {
   })
 });
 
+/**
+ * Method to allow users to login with the API
+ */
+app.post('users/login', (request, response) => {
+  var credentials = _.pick(request.body, ['email', 'password']);
+
+  response.send(credentials);
+})
 
 
+/**
+ * Gets the user request for himself.
+ */
 app.get('/users/me', authenticate, (request, response) => {
   response.send(request.user);
 })

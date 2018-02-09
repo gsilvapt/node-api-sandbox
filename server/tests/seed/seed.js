@@ -50,22 +50,28 @@ const users = [{
   password: 'abc123!'
 }];
 
+/**
+ * Method to populate the test database with two todo items to allow the testing
+ * of all routes.
+ */
 const populateTodos = ((done) => {
   Todo.remove({}).then(() => {
     return Todo.insertMany(todos);
   }).then(() => done());
 });
 
-const populateUsers = ((done) => {
+/**
+ * Method to populate the test database with two users to allow the testing
+ * of all routes.
+ */
+const populateUsers = (done) => {
   User.remove({}).then(() => {
     var userOne = new User(users[0]).save();
     var userTwo = new User(users[1]).save();
 
-    Promise.all([userOne, userTwo]).then(() => {
-
-    });
+    return Promise.all([userOne, userTwo])
   }).then(() => done());
-})
+};
 
 module.exports = {
   todos,
