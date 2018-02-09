@@ -24,7 +24,7 @@ var {
 } = require('./models/user');
 var {
   authenticate
-} = require('./middleware/authtenticate');
+} = require('./middleware/authenticate');
 
 var {
   ObjectID
