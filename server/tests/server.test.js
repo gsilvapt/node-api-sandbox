@@ -16,6 +16,9 @@ const {
 const {
   Todo
 } = require('./../models/todo');
+const {
+  User
+} = require('./../models/user')
 
 /**
  * Creates two mock tasks to allow the GET /todos method to be tested.
@@ -32,10 +35,24 @@ const todos = [{
   }
 ];
 
+const users = [{
+  _id: new ObjectID(),
+  email: 'oneValidEmail@domain.net',
+  password: '123abc!'
+}, {
+  _id: new ObjectID(),
+  email: 'anotherValidEmail@domain.net',
+  password: 'abc123!'
+}]
+
 beforeEach((done) => {
   Todo.remove({}).then(() => {
     return Todo.insertMany(todos);
-  }).then(() => done());
+  }).then(() => {
+    User.remove({}).then(() => {
+      return User.insertMany(users);
+    }).then(() => done())
+  });
 });
 
 describe('POST /todos', () => {
@@ -240,6 +257,44 @@ describe('PATCH/todos/:id', () => {
       })
       .expect(404)
       .end(done);
-  })
+  });
+});
 
-})
+describe('/POST/users', () => {
+  it('should allow creating a new user with a valid email and password', (done) => {
+    var newUser = {
+      email: 'aValidEmail@email.com',
+      password: '123abc!'
+    }
+    request(app)
+      .post('/users')
+      .send(newUser)
+      .expect(200)
+      .end(done);
+  });
+
+  it('should break with an invalid email', (done) => {
+    var newUser = {
+      email: 'abc',
+      password: 'doesntreallymatter'
+    };
+    request(app)
+      .post('/users')
+      .send(newUser)
+      .expect(400)
+      .end(done);
+  });
+
+  it('should not allow a duplicate email', (done) => {
+    var repeatedEmail = users[0].email;
+    var newUser = {
+      repeatedEmail,
+      password: '123abc!'
+    };
+    request(app)
+      .post('/users')
+      .send(newUser)
+      .expect(400)
+      .end(done);
+  });
+});
