@@ -189,6 +189,17 @@ app.post('/users/login', (request, response) => {
   });
 });
 
+/**
+ * App route to allow an user to delete a token - as in. logout from app.
+ */
+app.delete('/users/me/token', authenticate, (request, response) => {
+  request.user.removeToken(request.token).then(() => {
+    response.status(200).send();
+  }, () => {
+    response.status(400).send();
+  });
+})
+
 
 /**
  * Gets the user request for himself.

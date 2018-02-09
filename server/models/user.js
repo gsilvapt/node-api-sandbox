@@ -42,6 +42,9 @@ UserSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'email']);
 };
 
+/**
+ * Method to generate an authentication token when the user logs in.
+ */
 UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
@@ -58,6 +61,19 @@ UserSchema.methods.generateAuthToken = function () {
   return user.save().then(() => {
     return token;
   });
+};
+
+/**
+ * Method that removes a token from a user entry.
+ */
+UserSchema.methods.removeToken = function (token) {
+  var user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  })
 };
 
 UserSchema.statics.findByToken = function (token) {
