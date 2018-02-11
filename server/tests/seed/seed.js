@@ -11,27 +11,30 @@ const {
   User
 } = require('./../../models/user')
 
+/**
+ * Creates two mock users to allow GET and POST methods to be tested.
+ */
+const userOneId = new ObjectID();
+const userTwoId = new ObjectID();
 
 /**
  * Creates two mock tasks to allow the GET /todos method to be tested.
  */
 const todos = [{
     _id: new ObjectID(),
-    text: 'First test todo'
+    text: 'First test todo',
+    _creator: userOneId
   },
   {
     _id: new ObjectID(),
     text: 'Second test todo',
     completed: true,
-    completedAt: 333
+    completedAt: 333,
+    _creator: userTwoId
   }
 ];
 
-/**
- * Creates two mock users to allow GET and POST methods to be tested.
- */
-const userOneId = new ObjectID();
-const userTwoId = new ObjectID();
+
 
 const users = [{
   _id: userOneId,
@@ -47,7 +50,14 @@ const users = [{
 }, {
   _id: userTwoId,
   email: 'anotherValidEmail@domain.net',
-  password: 'abc123!'
+  password: 'abc123!',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({
+      _id: userTwoId,
+      access: 'auth'
+    }, 'abc123').toString()
+  }]
 }];
 
 /**
