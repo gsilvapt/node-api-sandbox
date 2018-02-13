@@ -106,26 +106,29 @@ app.get('/todos/:id', authenticate, (request, response) => {
  * Checks if the the todo is non empty, if it is returns a 404 not found.
  * If any other error occurs, it returns a 400 status code.
  */
-app.delete('/todos/:id', authenticate, (request, response) => {
+app.delete('/todos/:id', authenticate, async (request, response) => {
   var todoId = request.params.id;
 
   if (!ObjectID.isValid(todoId)) {
     return response.status(404).send();
   }
 
-  Todo.findOneAndRemove({
-    _id: todoId,
-    _creator: request.user._id
-  }).then((todo) => {
+  try {
+    const todo = await Todo.findOneAndRemove({
+      _id: todoId,
+      _creator: request.user._id
+    });
+
     if (!todo) {
       return response.status(404).send();
     }
     response.send({
       todo
     });
-  }).catch((error) => {
-    response.status(400).send();
-  });
+  } catch (error) {
+    response.status(400).send(error);
+  }
+
 });
 
 /**
@@ -152,7 +155,7 @@ app.patch('/todos/:id', authenticate, (request, response) => {
   Todo.findOneAndUpdate({
     _id: id,
     _creator: request.user._id
-   }, {
+  }, {
     $set: body
   }, {
     new: true
@@ -166,52 +169,50 @@ app.patch('/todos/:id', authenticate, (request, response) => {
     });
 
   }).catch((error) => {
-    response.status(404).send();
+    response.status(404).send(error);
   })
 });
 
 // POST /users
-app.post('/users', (request, response) => {
-  var body = _.pick(request.body, ['email', 'password']);
-  var user = new User(body);
-
-  user.save().then(() => {
-    var token = user.generateAuthToken();
-    return token;
-  }).then((token) => {
+app.post('/users', async (request, response) => {
+  try {
+    const body = await _.pick(request.body, ['email', 'password']);
+    let user = await new User(body).save();
+    const token = await user.generateAuthToken();
     response.header('x-auth', token).send({
       user
     });
-  }).catch((e) => {
-    response.status(400).send(e);
-  })
+  } catch (error) {
+    response.status(400).send(error);
+  }
 });
 
 /**
  * Method to allow users to login with the API
  */
-app.post('/users/login', (request, response) => {
-  var credentials = _.pick(request.body, ['email', 'password']);
+app.post('/users/login', async (request, response) => {
+  try {
+    const credentials = _.pick(request.body, ['email', 'password']);
+    const user = await User.findByCredentials(credentials.email, credentials.password);
+    const token = await user.generateAuthToken();
+    response.header('x-auth', token).send(user);
 
-  User.findByCredentials(credentials.email, credentials.password).then((user) => {
-    return user.generateAuthToken().then((token) => {
-      response.header('x-auth', token).send(user);
-    });
-  }).catch((error) => {
-    response.status(400).send();
-  });
+  } catch (error) {
+    response.status(400).send(error);
+  };
 });
 
 /**
  * App route to allow an user to delete a token - as in. logout from app.
  */
-app.delete('/users/me/token', authenticate, (request, response) => {
-  request.user.removeToken(request.token).then(() => {
+app.delete('/users/me/token', authenticate, async (request, response) => {
+  try {
+    await request.user.removeToken(request.token);
     response.status(200).send();
-  }, () => {
-    response.status(400).send();
-  });
-})
+  } catch (error) {
+    response.status(400).send(error);
+  }
+});
 
 
 /**
@@ -219,7 +220,7 @@ app.delete('/users/me/token', authenticate, (request, response) => {
  */
 app.get('/users/me', authenticate, (request, response) => {
   response.send(request.user);
-})
+});
 
 /**
  * Connects to localhost:3000 server
